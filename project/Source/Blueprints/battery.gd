@@ -11,6 +11,7 @@ export var CoolingRate: float = 0.5
 export var TAmbient: float = 25.0
 
 export var PolarizationTau: float = 2.0 
+export var R_polarization_ratio: float = 0.4 
 
 var _V_table: Array 
 var _V_table_resolution: int = 1000
@@ -69,9 +70,18 @@ func get_internal_conductance() -> float:
 func get_thermal_runaway_power() -> float:
 	return 0.02 * exp(0.08 * (T - 80.0))
 
-func get_degradation_rate() -> float:
-	return pow(max(0.0, T - 60.0), 2) * 0.000005
-
+func get_degradation_rate(current_I: float) -> float:
+	var cold_charge_damage = 0.0
+	if current_I > 0.0 and T < 5.0:
+		cold_charge_damage = current_I * abs(min(0.0, T - 5.0)) * 0.0001 
+	
+	var thermal_damage = pow(max(0.0, T - 60.0), 2) * 0.000005
+	
+	var low_voltage_damage = 0.0
+	if V < 2.5:
+		low_voltage_damage = pow(2.5 - V, 2) * 0.001 
+		
+	return thermal_damage + cold_charge_damage + low_voltage_damage
 
 func request(t_delta: float, I: float) -> float:
 	if is_dead:
@@ -80,32 +90,34 @@ func request(t_delta: float, I: float) -> float:
 		return 0.0
 		
 	var v_ideal = get_v_ideal()
-	var r_act = get_r_actual()
+	var r_total = get_r_actual()
+	
+	var r_ohmic = r_total * (1.0 - R_polarization_ratio)
+	var r_pol = r_total * R_polarization_ratio
 	
 	var g_short = get_internal_conductance()
 	var I_int = v_ideal * g_short
 	
-	var max_discharge_amps = -(v_ideal / max(0.0001, r_act))
+	var max_discharge_amps = -(v_ideal / max(0.0001, r_total))
 	if I < max_discharge_amps: I = max_discharge_amps
 	
 	var t_h = t_delta / 3600.0
-	
-	var total_drain = (I_int - I) * t_h
+	var total_drain = (I_int - I) * t_h 
 	
 	if C >= total_drain:
 		C -= total_drain
 	else:
-		I_int = C / t_h
-		if I < 0.0: I = -I_int
+		var out = C / t_h
+		if I < 0.0: I = -out 
 		C = 0.0
 		
 	if C > C_stress:
 		I = (C_stress - C) / t_h
 		C = C_stress
-		
-	C_stress = max(0.001, C_stress - get_degradation_rate() * t_delta)
 	
-	var P_heat = (I * I * r_act) + (I_int * I_int * (1.0 / max(0.001, g_short))) + get_thermal_runaway_power()
+	C_stress = max(0.001, C_stress - get_degradation_rate(I) * t_delta)
+	
+	var P_heat = (I * I * r_total) + (I_int * I_int * (1.0 / max(0.001, g_short))) + get_thermal_runaway_power()
 	var P_cool = (T - TAmbient) * CoolingRate
 	T += ((P_heat - P_cool) / HeatCapacity) * t_delta
 	
@@ -115,9 +127,12 @@ func request(t_delta: float, I: float) -> float:
 		C = 0.0
 		C_stress = 0.0
 		
-	var target_polarization = I * r_act - I_int * r_act
-	V_polarization = lerp(V_polarization, target_polarization, clamp(t_delta / PolarizationTau, 0.0, 1.0))
+	var target_polarization = (I - I_int) * r_pol
+	var alpha = 1.0 - exp(-t_delta / PolarizationTau)
+	V_polarization = lerp(V_polarization, target_polarization, alpha)
 	
-	V = max(0.0, v_ideal + V_polarization)
+	var instant_drop = (I - I_int) * r_ohmic 
+	
+	V = max(0.0, v_ideal + instant_drop + V_polarization)
 	
 	return I

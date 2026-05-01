@@ -78,31 +78,55 @@ func _ready():
 	graphs[3].fixed_max = 660.3
 
 func power_request(delta: float, P: float) -> float:
-	
 	return battery.request(delta, P/max(0.001, battery.V))
 
+func save_data():
+	var data: Dictionary = {}
+	
+	for i in range(graphs.size()):
+		var keys = graphs[i].lines.keys()
+		for id in range(keys.size()):
+			data[keys[id]] = graphs[i].lines[keys[id]]["data"]
+	
+	var file = File.new()
+	file.open("user://data.json", File.WRITE)
+	file.store_string(to_json(data))
+	
+	file.close()
+
+func droccel_request(delta: float):
+	var target_power = 125.0 
+	
+	var throttle_window_ideal = 0.5 
+	var ideal_v = battery.get_v_ideal()
+	var margin_ideal = ideal_v - battery.Voltage[0]
+	var throttle_ideal = clamp(margin_ideal / throttle_window_ideal, 0.0, 1.0)
+	
+	var throttle_window_real = 0.5
+	var margin_real = battery.V - 2.6
+	var throttle_real = clamp(margin_real / throttle_window_real, 0.0, 1.0)
+	
+	var final_throttle = min(throttle_ideal, throttle_real)
+	
+	var requested_power = target_power * final_throttle
+
+	graphs[1].append("I", power_request(delta, -requested_power))
+
 func _physics_process(delta):
-	if graphs[3].lines["T"]["data"].size() < 3600:
-		graphs[0].append("Ah", battery.C)
-		graphs[0].append("V", battery.V)
-		
-		graphs[1].append("I", power_request(delta, -210))
-		
-		graphs[2].append("Health", battery.get_Health()*100)
-		graphs[2].append("SoC", battery.get_SoC()*100)
-		
-		graphs[3].append("T", battery.T)
-	else:
-		var data: Dictionary = {}
-		
-		for i in range(graphs.size()):
-			var keys = graphs[i].lines.keys()
-			for id in range(keys.size()):
-				data[keys[id]] = graphs[i].lines[keys[id]]["data"]
-		
-		var file = File.new()
-		file.open("user://data.json", File.WRITE)
-		file.store_string(to_json(data))
-		
-		file.close()
-		get_tree().quit()
+	if false:
+		if graphs[3].lines["T"]["data"].size() == 3600:
+			save_data()
+			get_tree().quit()
+	
+	graphs[0].append("Ah", battery.C)
+	graphs[0].append("V", battery.V)
+	
+	droccel_request(delta)
+	#graphs[1].append("I", power_request(delta, -420))
+	
+	graphs[2].append("Health", battery.get_Health()*100)
+	graphs[2].append("SoC", battery.get_SoC()*100)
+	
+	graphs[3].append("T", battery.T)
+	
+	
