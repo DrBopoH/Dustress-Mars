@@ -95,7 +95,7 @@ func save_data():
 	file.close()
 
 func droccel_request(delta: float):
-	var target_power = 125.0 
+	var target_power = 850.0 
 	
 	var throttle_window_ideal = 0.5 
 	var ideal_v = battery.get_v_ideal()
@@ -121,8 +121,8 @@ func _physics_process(delta):
 	graphs[0].append("Ah", battery.C)
 	graphs[0].append("V", battery.V)
 	
-	droccel_request(delta)
-	#graphs[1].append("I", power_request(delta, -420))
+	#droccel_request(delta)
+	graphs[1].append("I", power_request(delta, -850))
 	
 	graphs[2].append("Health", battery.get_Health()*100)
 	graphs[2].append("SoC", battery.get_SoC()*100)
