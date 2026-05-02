@@ -121,8 +121,8 @@ func _physics_process(delta):
 	graphs[0].append("Ah", battery.C)
 	graphs[0].append("V", battery.V)
 	
-	#droccel_request(delta)
-	graphs[1].append("I", power_request(delta, -850))
+	droccel_request(delta)
+	#graphs[1].append("I", power_request(delta, -850))
 	
 	graphs[2].append("Health", battery.get_Health()*100)
 	graphs[2].append("SoC", battery.get_SoC()*100)
