@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=2]
+
+[sub_resource type="SpatialMaterial" id=3]
+albedo_color = Color( 0.733333, 0.415686, 0.243137, 1 )
+roughness = 0.9
+
+[sub_resource type="PlaneMesh" id=1]
+material = SubResource( 3 )
+size = Vector2( 20, 20 )
+
+[sub_resource type="PlaneShape" id=2]
+
+[node name="Floor" type="StaticBody"]
+
+[node name="MeshInstance" type="MeshInstance" parent="."]
+mesh = SubResource( 1 )
+
+[node name="CollisionShape" type="CollisionShape" parent="."]
+shape = SubResource( 2 )

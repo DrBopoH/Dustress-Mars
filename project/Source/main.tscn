@@ -1,6 +1,20 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://Source/Scripts/main.gd" type="Script" id=1]
+[ext_resource path="res://Assets/Entity/VehicleBody.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Assets/Levels/0.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Source/main.gd" type="Script" id=3]
 
 [node name="main" type="Node"]
-script = ExtResource( 1 )
+script = ExtResource( 3 )
+
+[node name="Floor" parent="." instance=ExtResource( 2 )]
+
+[node name="VehicleBody" parent="." instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.51027, 0 )
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.58098, 4.42207 )
+
+[node name="DirectionalLight" type="DirectionalLight" parent="."]
+transform = Transform( -0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, 0.5, -0.5, 0, 0, 0 )
+light_color = Color( 1, 0.968627, 0.909804, 1 )
