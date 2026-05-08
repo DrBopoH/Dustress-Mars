@@ -5,7 +5,7 @@ var layers: Dictionary
 
 func _ready():
 	for child in get_children():
-		layers[child.name + str(child.get_instance_id())] = bake_graph_recursively(child)
+		layers[child.name] = bake_graph_recursively(child)
 	
 	print_composition_layers(layers.keys())
 
