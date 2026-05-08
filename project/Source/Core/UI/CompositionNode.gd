@@ -1,6 +1,7 @@
 class_name CompositionNode
 
 var name: String
+var instance: String
 var parent: CompositionNode
 var childrens: Array = []
 #var shared_layers: Array = []

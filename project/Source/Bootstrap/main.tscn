@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Source/Core/UI/ScreenCompositor.gd" type="Script" id=1]
+[ext_resource path="res://Assets/Data/Entities/VehicleBody.tscn" type="PackedScene" id=2]
 
 [node name="main" type="Node"]
 script = ExtResource( 1 )
@@ -9,13 +10,17 @@ script = ExtResource( 1 )
 
 [node name="World" type="Spatial" parent="Spatial"]
 
-[node name="Vehile" type="Spatial" parent="Spatial/World"]
+[node name="VehicleBody" parent="Spatial/World" instance=ExtResource( 2 )]
+
+[node name="Spatial" type="Spatial" parent="Spatial/World/VehicleBody"]
 
 [node name="Tree" type="Spatial" parent="Spatial/World"]
 
 [node name="Sky" type="Spatial" parent="Spatial"]
 
 [node name="Sun" type="Spatial" parent="Spatial/Sky"]
+
+[node name="Camera" type="Camera" parent="Spatial/Sky/Sun"]
 
 [node name="UI" type="Control" parent="."]
 margin_right = 40.0
