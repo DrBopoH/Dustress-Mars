@@ -14,20 +14,32 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Source/draft/battery.gd"
 }, {
+"base": "Reference",
+"class": "CompositionNode",
+"language": "GDScript",
+"path": "res://Source/Core/UI/CompositionNode.gd"
+}, {
 "base": "ColorRect",
 "class": "GraphGenerator",
 "language": "GDScript",
-"path": "res://Source/UI/Graph/GraphGenerator.gd"
+"path": "res://Source/Core/UI/Graph/GraphGenerator.gd"
+}, {
+"base": "Node",
+"class": "ScreenCompositor",
+"language": "GDScript",
+"path": "res://Source/Core/UI/ScreenCompositor.gd"
 } ]
 _global_script_class_icons={
 "Battery": "",
-"GraphGenerator": ""
+"CompositionNode": "",
+"GraphGenerator": "",
+"ScreenCompositor": ""
 }
 
 [application]
 
 config/name="Dustress Mars"
-run/main_scene="res://Source/main.tscn"
+run/main_scene="res://Source/Bootstrap/main.tscn"
 config/icon="res://App/icon.webp"
 
 [gui]
