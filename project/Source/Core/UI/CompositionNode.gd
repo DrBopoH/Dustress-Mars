@@ -9,7 +9,7 @@ var instance: Node
 
 
 
-func _init(reference: Node, parent: CompositionNode = null) -> void:
+func _init(reference: Node, _parent: CompositionNode = null) -> void:
 	self.name = reference.name
 	self.instance = reference
-	self.parent = parent
+	self.parent = _parent
