@@ -1,13 +1,15 @@
 class_name CompositionNode
 
 var name: String
-var instance: String
 var parent: CompositionNode
 var childrens: Array = []
-#var shared_layers: Array = []
-#var scene
-#var cache_policy
 
-func _init(_name: String, _parent: CompositionNode = null):
-	name = _name
-	parent = parent
+var path_to_instance: String
+var instance: Node
+
+
+
+func _init(reference: Node, parent: CompositionNode = null) -> void:
+	self.name = reference.name
+	self.instance = reference
+	self.parent = parent
