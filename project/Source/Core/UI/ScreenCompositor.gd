@@ -53,7 +53,7 @@ func print_composition_graph(
 
 
 func print_composition_layers(layers_list: Array) -> void:
-	for layer in layers:
+	for layer in layers_list:
 		print(layer)
 		print_composition_graph(layers[layer])
 
