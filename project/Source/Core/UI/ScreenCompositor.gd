@@ -3,11 +3,9 @@ extends Node
 
 var layers: Dictionary
 
-func _ready() -> void:
-	for child in self.get_children():
-		self.layers[child.name] = self.bake_graph_recursively(child)
-	
-	self.print_composition_layers(self.layers.keys())
+#func _ready() -> void:
+#	for child in self.get_children():
+#		self.layers[child.name] = self.bake_graph_recursively(child)
 
 
 
@@ -37,7 +35,7 @@ func print_composition_graph(
 			full_regular += regular_middletree
 			regular += regular_branch
 		
-		print(full_regular, composition_node.name, ": (" + composition_node.path_to_instance + ")")
+		print(full_regular, composition_node.name + "::" + str(composition_node.instance), " (" + composition_node.path_to_instance + ")")
 		if endl != '': 
 			print(endl)
 	
@@ -73,5 +71,6 @@ func bake_graph_recursively(
 	
 	for child in reference_node.get_children():
 		self.bake_graph_recursively(child, composition_node)
+		composition_node.instance.queue_free()
 	
 	return composition_node
