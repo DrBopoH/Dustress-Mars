@@ -4,10 +4,10 @@ extends Node
 var layers: Dictionary
 
 func _ready() -> void:
-	for child in get_children():
-		layers[child.name] = bake_graph_recursively(child)
+	for child in self.get_children():
+		self.layers[child.name] = self.bake_graph_recursively(child)
 	
-	print_composition_layers(layers.keys())
+	self.print_composition_layers(self.layers.keys())
 
 
 
@@ -18,6 +18,7 @@ func print_composition_graph(
 	regular_branch: String = ' |  ',
 	regular_intent: String = '    ',
 	regular: String = ''
+
 ) -> void:
 	if composition_node.parent != null:
 		var full_regular: String = regular
@@ -36,12 +37,12 @@ func print_composition_graph(
 			full_regular += regular_middletree
 			regular += regular_branch
 		
-		print(full_regular, composition_node.name, ": (" + composition_node.instance + ")")
+		print(full_regular, composition_node.name, ": (" + composition_node.path_to_instance + ")")
 		if endl != '': 
 			print(endl)
 	
 	for child in composition_node.childrens:
-		print_composition_graph(
+		self.print_composition_graph(
 			child,
 			regular_tree,
 			regular_middletree,
@@ -55,7 +56,7 @@ func print_composition_graph(
 func print_composition_layers(layers_list: Array) -> void:
 	for layer in layers_list:
 		print(layer)
-		print_composition_graph(layers[layer])
+		self.print_composition_graph(layers[layer])
 
 
 
@@ -83,6 +84,6 @@ func bake_graph_recursively(reference_node: Node, parent_composition_node: Compo
 	_attach_to_parent(composition_node, parent_composition_node)
 	
 	for child in reference_node.get_children():
-		bake_graph_recursively(child, composition_node)
+		self.bake_graph_recursively(child, composition_node)
 	
 	return composition_node
