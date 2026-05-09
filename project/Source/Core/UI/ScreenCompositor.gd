@@ -3,7 +3,7 @@ extends Node
 
 var layers: Dictionary
 
-func _ready():
+func _ready() -> void:
 	for child in get_children():
 		layers[child.name] = bake_graph_recursively(child)
 	
@@ -12,6 +12,7 @@ func _ready():
 
 
 func print_composition_layers(layers_list: Array):
+func print_composition_layers(layers_list: Array) -> void:
 	for layer in layers:
 		print(layer)
 		print_composition_graph(layers[layer])
