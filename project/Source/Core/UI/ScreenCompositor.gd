@@ -13,9 +13,9 @@ func _ready() -> void:
 
 func print_composition_graph(
 	composition_node: CompositionNode,
-	regular_tree: String = ' |_ ',
-	regular_middletree: String = ' |- ',
-	regular_branch: String = ' |  ',
+	regular_tree: String = '└── ',
+	regular_middletree: String = '├── ',
+	regular_branch: String = '│   ',
 	regular_intent: String = '    ',
 	regular: String = ''
 
