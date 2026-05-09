@@ -11,7 +11,47 @@ func _ready() -> void:
 
 
 
-func print_composition_layers(layers_list: Array):
+func print_composition_graph(
+	composition_node: CompositionNode,
+	regular_tree: String = ' |_ ',
+	regular_middletree: String = ' |- ',
+	regular_branch: String = ' |  ',
+	regular_intent: String = '    ',
+	regular: String = ''
+) -> void:
+	if composition_node.parent != null:
+		var full_regular: String = regular
+		var endl: String = ''
+		
+		if composition_node == composition_node.parent.childrens[-1]:
+			full_regular += regular_tree
+			
+			if composition_node.parent.parent != null:
+				if composition_node.parent != composition_node.parent.parent.childrens[-1]:
+					endl = regular
+			
+			regular += regular_intent
+		
+		else:
+			full_regular += regular_middletree
+			regular += regular_branch
+		
+		print(full_regular, composition_node.name, ": (" + composition_node.instance + ")")
+		if endl != '': 
+			print(endl)
+	
+	for child in composition_node.childrens:
+		print_composition_graph(
+			child,
+			regular_tree,
+			regular_middletree,
+			regular_branch,
+			regular_intent,
+			regular
+		)
+
+
+
 func print_composition_layers(layers_list: Array) -> void:
 	for layer in layers:
 		print(layer)
@@ -19,30 +59,28 @@ func print_composition_layers(layers_list: Array) -> void:
 
 
 
-func print_composition_graph(composition_node: CompositionNode, depth: int = 0, reg: String = ' |_ '):
-	if composition_node.parent != null:
-		print(reg.repeat(depth), composition_node.name, ": (" + composition_node.instance + ")")
+func _attach_to_parent(node: CompositionNode, parent: CompositionNode) -> void:
+	if parent == null: return
 	
-	for child in composition_node.childrens:
-		print_composition_graph(child, depth + 1)
-
-
+	node.parent = parent
+	parent.childrens.append(node)
 
 func get_scene_path_from_node(reference_node: Node) -> String:
 	if reference_node == null: return ''
 	
 	return reference_node.get_filename()
 
-
-
-func bake_graph_recursively(reference_node: Node, parent_composition_node: CompositionNode = null) -> CompositionNode:
-	var composition_node := CompositionNode.new(reference_node.name, parent_composition_node)
+func _create_composition_node(reference_node: Node, parent: CompositionNode) -> CompositionNode:
+	var composition_node := CompositionNode.new(reference_node.name, parent)
 	
 	composition_node.instance = get_scene_path_from_node(reference_node)
 	
-	if parent_composition_node != null:
-		composition_node.parent = parent_composition_node
-		parent_composition_node.childrens.append(composition_node)
+	return composition_node
+
+func bake_graph_recursively(reference_node: Node, parent_composition_node: CompositionNode = null) -> CompositionNode:
+	var composition_node := _create_composition_node(reference_node, parent_composition_node)
+	
+	_attach_to_parent(composition_node, parent_composition_node)
 	
 	for child in reference_node.get_children():
 		bake_graph_recursively(child, composition_node)
